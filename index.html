@@ -1,50 +1,223 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <title>Tabla de usuarios</title>
-</head>
-<body>
-  <h1>Tabla de usuarios</h1>
-  <table>
-    <thead>
-      <tr>
-        <th>Nombre</th>
-        <th>Apellido</th>
-        <th>Correo electrónico</th>
-        <th>Edad</th>
-        <th>Acciones</th>
-      </tr>
-    </thead>
-    <tbody id="tabla-usuarios">
-    </tbody>
-  </table>
+  <head>
+    <title>CRUD con API</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+      }
+      h1 {
+        font-size: 36px;
+        text-align: center;
+      }
+      h2 {
+        font-size: 24px;
+        margin-top: 40px;
+      }
+      form {
+        margin-top: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      label {
+        margin-right: 10px;
+      }
+      input {
+        margin-bottom: 10px;
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-size: 16px;
+        width: 100%;
+        box-sizing: border-box;
+      }
+      button {
+        margin-top: 10px;
+        padding: 8px;
+        font-size: 16px;
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+      button:hover {
+        background-color: #0069d9;
+      }
+      table {
+        margin-top: 40px;
+        border-collapse: collapse;
+        width: 100%;
+      }
+      th,
+      td {
+        padding: 12px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+      }
+      th {
+        background-color: #007bff;
+        color: #fff;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Usuarios</h1>
+    <button id="btn-leer">Leer usuarios</button>
+    <table id="tabla-usuarios">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nombre</th>
+          <th>Apellido</th>
+          <th>Correo electrónico</th>
+          <th>Edad</th>
+          <th>Fecha de creación</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+    <hr />
+    <h2>Crear usuario</h2>
+    <form id="formulario-crear">
+      <label for="nombre">Nombre:</label>
+      <input type="text" name="nombre" />
+      <br />
+      <label for="apellido">Apellido:</label>
+      <input type="text" name="apellido" />
+      <br />
+      <label for="correo">Correo electrónico:</label>
+      <input type="email" name="correoElectronico" />
+      <br />
+      <label for="edad">Edad:</label>
+      <input type="number" name="edad" />
+      <br />
+      <button type="submit">Crear usuario</button>
+    </form>
+    <hr />
+    <h2>Actualizar usuario</h2>
+    <form id="formulario-actualizar">
+      <label for="id-actualizar">ID:</label>
+      <input type="number" name="id" required />
+      <br />
+      <label for="nombre-actualizar">Nombre:</label>
+      <input type="text" name="nombre" required />
+      <br />
+      <label for="apellido-actualizar">Apellido:</label>
+      <input type="text" name="apellido" required />
+      <br />
+      <label for="correo-actualizar">Correo electrónico:</label>
+      <input type="email" name="correoElectronico" required />
+      <br />
+      <label for="edad-actualizar">Edad:</label>
+      <input type="number" name="edad" required />
+      <br />
+      <button type="submit">Actualizar usuario</button>
+    </form>
+    <hr />
+    <h2>Eliminar usuario</h2>
+    <form id="formulario-eliminar">
+      <label for="id-eliminar">ID:</label>
+      <input type="number" name="id" required />
+      <br />
+      <button type="submit">Eliminar usuario</button>
+    </form>
 
-  <script>
-    const tabla = document.querySelector('#tabla-usuarios');
+    
 
-    // Función para actualizar la tabla de usuarios
-    async function actualizarTabla() {
-      tabla.innerHTML = '';
-      const URL_API = 'https://apigithubio-production.up.railway.app/usuarios';
-      const respuesta = await fetch(URL_API);
-      const usuarios = await respuesta.json();
-      usuarios.forEach(usuario => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td>${usuario.nombre}</td>
-          <td>${usuario.apellido}</td>
-          <td>${usuario.correoElectronico}</td>
-          <td>${usuario.edad}</td>
-          <td>
-            <button class="boton-actualizar" data-id="${usuario.id}">Actualizar</button>
-            <button class="boton-eliminar" data-id="${usuario.id}">Eliminar</button>
-          </td>
-        `;
-        tabla.appendChild(tr);
+    <script>
+      const tablaUsuarios = document.querySelector("#tabla-usuarios");
+      const btnLeer = document.querySelector("#btn-leer");
+      const formularioCrear = document.querySelector("#formulario-crear");
+      const formularioActualizar = document.querySelector(
+        "#formulario-actualizar"
+      );
+      const formularioEliminar = document.querySelector("#formulario-eliminar");
+
+      // función para mostrar los usuarios en la tabla
+      function mostrarUsuarios(usuarios) {
+        let html = "";
+        for (let usuario of usuarios) {
+          html += `
+      			<tr>
+      				<td>${usuario.id}</td>
+      				<td>${usuario.nombre}</td>
+      				<td>${usuario.apellido}</td>
+      				<td>${usuario.correoElectronico}</td>
+      				<td>${usuario.edad}</td>
+      				<td>${usuario.fechaDeCreacion}</td>
+      			</tr>
+      		`;
+        }
+        tablaUsuarios.querySelector("tbody").innerHTML = html;
+      }
+
+      // evento para leer los usuarios
+      btnLeer.addEventListener("click", () => {
+        fetch("https://apigithubio-production.up.railway.app/usuarios")
+          .then((respuesta) => respuesta.json())
+          .then(mostrarUsuarios)
+          .catch((error) => console.error(error));
       });
-    }
 
-    actualizarTabla();
-  </script>
-</body>
+      // evento para crear un usuario
+      formularioCrear.addEventListener("submit", (evento) => {
+        evento.preventDefault();
+        const formData = new FormData(formularioCrear);
+        fetch("https://apigithubio-production.up.railway.app/usuarios", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(Object.fromEntries(formData)),
+        })
+          .then((respuesta) => respuesta.json())
+          .then((usuario) => {
+            alert(`Usuario creado con ID ${usuario.id}`);
+            formularioCrear.reset();
+          })
+          .catch((error) => console.error(error));
+      });
+
+      // evento para actualizar un usuario
+      formularioActualizar.addEventListener("submit", (evento) => {
+        evento.preventDefault();
+        const formData = new FormData(formularioActualizar);
+        const id = formData.get("id");
+        fetch(`https://apigithubio-production.up.railway.app/usuarios/${id}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(usuario),
+        })
+          .then((respuesta) => respuesta.json())
+          .then((usuario) => {
+            alert(`Usuario actualizado con ID ${usuario.id}`);
+            formularioActualizar.reset();
+          })
+          .catch((error) => console.error(error));
+      });
+
+      // evento para eliminar un usuario
+      formularioEliminar.addEventListener("submit", (evento) => {
+        evento.preventDefault();
+        const formData = new FormData(formularioEliminar);
+        const id = formData.get("id");
+        fetch(`https://apigithubio-production.up.railway.app/usuarios/${id}`, {
+          method: "DELETE",
+        })
+          .then((respuesta) => {
+            if (respuesta.ok) {
+              alert(`Usuario eliminado con ID ${id}`);
+              formularioEliminar.reset();
+            } else {
+              alert(`Error al eliminar el usuario con ID ${id}`);
+            }
+          })
+          .catch((error) => console.error(error));
+      });
+    </script>
+  </body>
 </html>
